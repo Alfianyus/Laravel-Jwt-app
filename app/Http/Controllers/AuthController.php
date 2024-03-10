@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Customers;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -29,6 +32,7 @@ class AuthController extends Controller
      {
         $validator = Validator::make(request()->all(),[
             'name'=>'required',
+            'firstname'=>'required',
             'email'=>'required|email|unique:users',
             'password'=> 'required' 
         ]);
@@ -39,8 +43,9 @@ class AuthController extends Controller
         }
 
 
-        $user=User::create([
+        $user=Customers::create([
             'name' => request('name'),
+            'firstname' => request('firstname'),
             'email'=> request('email'),
             'password'=> Hash::make(request('password')),
         ]);
@@ -56,15 +61,21 @@ class AuthController extends Controller
 
 
 
-    public function login()
+    public function login(Request $request)
     {
-        $credentials = request(['email', 'password']);
+        $credentials = $request->only(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if($token = Auth::guard('api')->attempt($credentials)){
+            return $this->respondWithToken($token);
         }
 
-        return $this->respondWithToken($token);
+        return response()->json(['error' => 'Unauthorized'], 401);
+
+        // if (! $token = auth()->attempt($credentials)) {
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
+
+        // return $this->respondWithToken($token);
     }
 
     /**

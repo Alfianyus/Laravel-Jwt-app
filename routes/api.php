@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,11 +15,16 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
-    Route::post('register', [AuthController::class,'register']);
-    Route::post('login', [AuthController::class,'login']);
-    Route::post('logout', [AuthController::class,'logout']);
-    Route::post('refresh', [AuthController::class,'refresh']);
-    Route::post('me', [AuthController::class,'me']);
+Route::prefix('customers')->group(function(){
+    Route::post('register', [CustomerAuthController::class,'register']);
+    Route::post('login', [CustomerAuthController::class,'login']);
+    Route::post('logout', [CustomerAuthController::class,'logout']);
+    Route::post('me', [CustomerAuthController::class,'me']);
+    Route::post('refresh', [CustomerAuthController::class,'refresh']);
 });
+
+// Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
+//     Route::post('logout', [AuthController::class,'logout']);
+//     Route::post('refresh', [AuthController::class,'refresh']);
+//     Route::post('me', [AuthController::class,'me']);
+// });
